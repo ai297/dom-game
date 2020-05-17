@@ -244,6 +244,7 @@
             this.gameUi.style.visibility = 'hidden';
             this.baseRotationX = 60;
             this.field.style.transform = `rotateX(${this.baseRotationX}deg) rotateY(0deg)`;
+            document.addEventListener("doubleclick", (e) => e.preventDefault());
 
             this.player = new Character(document.getElementById("player"), document.getElementById("player-avatar"));
             this.enimy = new Character(document.getElementById("black-hole"), document.getElementById("blackhole-avatar"));
@@ -274,6 +275,7 @@
                 var halfHeight = document.documentElement.clientHeight / 2;
                 this.dynamycData.xMultipler = (this.dynamycData.xMultipler + (e.touches[e.touches.length - 1].clientX - halfWidth) / halfWidth) / 2;
                 this.dynamycData.yMultipler = (this.dynamycData.yMultipler + (e.touches[e.touches.length - 1].clientY - halfHeight) / halfHeight) / 2;
+                //e.preventDefault();
             }
 
             this.updateGameUi = () => {
@@ -292,6 +294,8 @@
             this.start = async () => {
                 this.controller.addEventListener("mousemove", this.mouseMove);
                 document.addEventListener("touchstart", this.touchEvent);
+                document.addEventListener("touchend", this.touchEvent);
+                document.addEventListener("touchmove", this.touchEvent);
                 this.welcomeScreen.style.display = 'none';
                 this.startScreen.style.visibility = 'hidden';
                 this.gameUi.style.visibility = 'visible';
@@ -367,6 +371,8 @@
             this.stop = () => {
                 this.controller.removeEventListener("mousemove", this.mouseMove);
                 document.removeEventListener("touchstart", this.touchEvent);
+                document.removeEventListener("touchend", this.touchEvent);
+                document.removeEventListener("touchmove", this.touchEvent);
                 this.controller.style.pointerEvents = 'none';
                 this.gameUi.style.visibility = 'hidden';
                 this.isStarted = false;
