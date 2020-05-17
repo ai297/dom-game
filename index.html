@@ -269,6 +269,12 @@
                 this.dynamycData.xMultipler = (this.dynamycData.xMultipler + (e.offsetX - halfWidth) / halfWidth) / 2;
                 this.dynamycData.yMultipler = (this.dynamycData.yMultipler + (e.offsetY - halfHeight) / halfHeight) / 2;
             }
+            this.touchEvent = (e) => {
+                var halfWidth = document.documentElement.clientWidth / 2;
+                var halfHeight = document.documentElement.clientHeight / 2;
+                this.dynamycData.xMultipler = (this.dynamycData.xMultipler + (e.touches[e.touches.length - 1].clientX - halfWidth) / halfWidth) / 2;
+                this.dynamycData.yMultipler = (this.dynamycData.yMultipler + (e.touches[e.touches.length - 1].clientY - halfHeight) / halfHeight) / 2;
+            }
 
             this.updateGameUi = () => {
                 this.scoreUi.innerText = Math.round(this.score);
@@ -285,6 +291,7 @@
 
             this.start = async () => {
                 this.controller.addEventListener("mousemove", this.mouseMove);
+                document.addEventListener("touchstart", this.touchEvent);
                 this.welcomeScreen.style.display = 'none';
                 this.startScreen.style.visibility = 'hidden';
                 this.gameUi.style.visibility = 'visible';
@@ -296,6 +303,8 @@
                     width: this.field.clientWidth,
                     height: this.field.clientHeight,
                 }
+                this.dynamycData.xMultipler = 0;
+                this.dynamycData.yMultipler = 0;
                 var time = Date.now();
                 this.player.setX( Math.round(Math.random()) * (fRect.width - this.player.width) + this.player.width/2);
                 this.player.setY(Math.round(Math.random()) * (fRect.height - this.player.height) + this.player.height/2);
@@ -357,6 +366,7 @@
 
             this.stop = () => {
                 this.controller.removeEventListener("mousemove", this.mouseMove);
+                document.removeEventListener("touchstart", this.touchEvent);
                 this.controller.style.pointerEvents = 'none';
                 this.gameUi.style.visibility = 'hidden';
                 this.isStarted = false;
