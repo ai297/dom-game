@@ -1,0 +1,431 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>DOM Game</title>
+        <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&display=swap" rel="stylesheet">
+        <style>
+            * {
+                font-family: 'Bebas Neue', cursive;
+            }
+            html {
+                font-size: 24px;
+                margin: 0;
+                padding: 0;
+            }
+            body {
+                margin: 0;
+                padding: 0;
+            }
+            h1 {
+                margin: .5rem;
+            }
+            .wrap {
+                position: fixed;
+                width: 100%;
+                height: 100%;
+                left: 0;
+                top: 0;
+                overflow: hidden;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                perspective: 1000px;
+                background: linear-gradient(to bottom, #3A758C, #70deeb);
+            }
+            #playing-field {
+                display: block;
+                position: relative;
+                width: 25rem;
+                height: 25rem;
+                border: 2rem solid #3A758C;
+                border-radius: 3rem;
+                background-color: #F2D022;
+                box-shadow: inset 0 0 1rem .25rem black;
+                transform-style: preserve-3d;
+            }
+            #black-hole {
+                display: block;
+                position: absolute;
+                width: 4rem;
+                height: 4rem;
+                border-radius: 50%;
+                background-color: black;
+                transition: opacity .5s .5s;
+                left: 10.5rem;
+                top: 10.5rem;
+                box-shadow: 0 0 1rem 1.1rem black;
+                opacity: .9;
+            }
+            #blackhole-avatar {
+                display: block;
+                position: absolute;
+                width: 4rem;
+                height: 4rem;
+                border-radius: 50%;
+                background: radial-gradient(at bottom,black, transparent 60%, transparent);
+                transition: opacity .5s .5s;
+                left: 10.5rem;
+                top: 10.5rem;
+            }
+            #player {
+                display: block;
+                position: absolute;
+                width: 3rem;
+                height: 3rem;
+                border-radius: 50%;
+                background: radial-gradient(circle at center, #000, #000 30%, transparent 70%, transparent);
+                transition: opacity .5s;
+                opacity: 1;
+                
+                left: 11rem;
+                top: 11rem;
+                
+            }
+            #player-avatar {
+                display: block;
+                position: absolute;
+                width: 3rem;
+                height: 3rem;
+                border-radius: 50%;
+                background-color: #F22233;
+                box-shadow: inset 0 -.2rem .5rem 0 black;
+                transform-style: preserve-3d;
+                transition: opacity .5s;
+
+                left: 11rem;
+                top: 11rem;
+            }
+            .fullscreen {
+                position: fixed;
+                width: 100%;
+                height: 100%;
+                left: 0;
+                top: 0;
+            }
+            #controller {
+                display: block;
+                z-index: 100;
+            }
+            #ui {
+                display: block;
+                z-index: 50;
+            }
+            #start-screen {
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                justify-content: center;
+                background-color: rgba(58, 117, 140, 0.8);
+                text-align: center;
+                color: #F2D022;
+                font-size: 2rem;
+            }
+            #start-screen span {
+                display: block;
+                width: 35rem;
+                max-width: 100%;
+            }
+            #end-score {
+                font-size: 4rem;
+            }
+            #game-over {
+                display: none;
+            }
+            #start-button {
+                display: block;
+                font-size: 2rem;
+                padding: .5rem 1.5rem;
+                color: #F2D022;
+                outline: none;
+                background-color: #F22233;
+                border: none;
+                border-radius: 1rem;
+                cursor: pointer;
+                box-shadow: 0 2px 4px black;
+                margin-top: 1rem;
+            }
+            #start-button:hover {
+                background-color: #F29E38;
+                color: #F22233;
+            }
+            #start-button:active {
+                transform: translateY(3px);
+            }
+            #game-ui {
+                display: flex;
+                flex-direction: column;
+                align-items: flex-end;
+                justify-content: flex-start;
+                font-size: 2rem;
+                padding: 1rem;
+                box-sizing: border-box;
+                pointer-events: none;
+                color: #F2D022;
+                text-shadow: 0 1px 2px black;
+            }
+            #score, #level {
+                color: #F29E38;
+            }
+
+            .contacts {
+                position: absolute;
+                bottom: 1rem;
+                width: 100%;
+                color: #2c5363;
+                font-size: .8rem;
+                text-align: center;
+            }
+            .contacts a {
+                color: inherit;
+                text-decoration: none;
+            }
+            .contacts a:hover {
+                color: black;
+                text-decoration: underline;
+            }
+
+            @media (max-width: 1200px), (max-height: 700px)  {
+                html {
+                    font-size: 18px;
+                }
+            }
+            @media (max-width: 800px), (max-height: 580px)  {
+                html {
+                    font-size: 14px;
+                }
+            }
+            
+        </style>
+    </head>
+    <body>
+        <div class="wrap">
+            <div id="playing-field">
+                <div id="black-hole"></div>
+                <div id="player"></div>
+                <div id="blackhole-avatar"></div>
+                <div id="player-avatar"></div>
+            </div>
+        </div>
+        <div id="ui" class="fullscreen">
+            <div id="start-screen" class="fullscreen">
+                <div id="game-over">
+                    <h1>Game over!</h1>
+                    <span>Your score is</span>
+                    <span id="end-score"></span>
+                </div>
+                <div id="welcome">
+                    <h1>Welcome!</h1>
+                    <span>Move your cursor to control the Ball and help it to escape from Black Hole </span>
+                </div>
+                <button id="start-button">Start Game</button>
+                <div class="contacts"><a href="https://vk.com/dwind">Igumnov Aleksey</a></div>
+            </div>
+            <div id="game-ui" class="fullscreen">
+                <div>Score: <span id="score">0</span></div>
+                <div>Level: <span id="level">1</span></div>
+            </div>
+        </div>
+        <div id="controller" class="fullscreen"></div>
+    </body>
+    <script>
+        
+        function BlackHoleGame() {
+            this.field = document.getElementById("playing-field");
+            this.controller = document.getElementById("controller");
+            this.startScreen = document.getElementById("start-screen");
+            this.welcomeScreen = document.getElementById('welcome');
+            this.startButton = document.getElementById("start-button");
+            this.endScoreUi = document.getElementById("end-score");
+            this.gameUi = document.getElementById("game-ui");
+            this.scoreUi = document.getElementById("score");
+            this.levelUi = document.getElementById("level");
+
+            this.controller.style.pointerEvents = 'none';
+            this.gameUi.style.visibility = 'hidden';
+            this.baseRotationX = 60;
+            this.field.style.transform = `rotateX(${this.baseRotationX}deg) rotateY(0deg)`;
+
+            this.player = new Character(document.getElementById("player"), document.getElementById("player-avatar"));
+            this.enimy = new Character(document.getElementById("black-hole"), document.getElementById("blackhole-avatar"));
+            this.player.avatarYOffset = this.player.avatar.clientHeight / 10;
+
+            this.isStarted = false;
+            this.gameLevel = 1;
+            this.level = 1;
+            this.score = 0;
+
+            this.dynamycData = {
+                xMultipler: 0,          // смещение мышки относительно центра страницы, от -1 до 1
+                yMultipler: 0,
+                
+                uiTimer: null,
+                levelTimer: null,
+            };
+
+            this.mouseMove = (e) => {
+                var controllerRect = this.controller.getBoundingClientRect();
+                var halfWidth = controllerRect.width / 2;
+                var halfHeight = controllerRect.height / 2;
+                this.dynamycData.xMultipler = (this.dynamycData.xMultipler + (e.offsetX - halfWidth) / halfWidth) / 2;
+                this.dynamycData.yMultipler = (this.dynamycData.yMultipler + (e.offsetY - halfHeight) / halfHeight) / 2;
+            }
+
+            this.updateGameUi = () => {
+                this.scoreUi.innerText = Math.round(this.score);
+                this.levelUi.innerText = this.level;
+                this.dynamycData.uiTimer = setTimeout(this.updateGameUi, 500);
+            }
+
+            this.levelUp = () => {
+                this.gameLevel *= 1.1;
+                this.level++;
+                console.log("Level Up!");
+            }
+
+
+            this.start = async () => {
+                this.controller.addEventListener("mousemove", this.mouseMove);
+                this.welcomeScreen.style.display = 'none';
+                this.startScreen.style.visibility = 'hidden';
+                this.gameUi.style.visibility = 'visible';
+                this.controller.style.pointerEvents = 'unset';
+                this.gameLevel = 1;
+                this.level = 1;
+                this.score = 0;
+                var fRect = { 
+                    width: this.field.clientWidth,
+                    height: this.field.clientHeight,
+                }
+                var time = Date.now();
+                this.player.setX( Math.round(Math.random()) * (fRect.width - this.player.width) + this.player.width/2);
+                this.player.setY(Math.round(Math.random()) * (fRect.height - this.player.height) + this.player.height/2);
+                this.enimy.setX(fRect.width / 2);
+                this.enimy.setY(fRect.height / 2);
+
+                // начальная скорость персонажа и "врага"
+                this.player.baseSpeed = fRect.width / 2.5;
+                this.enimy.baseSpeed = this.player.baseSpeed / 2;
+                
+                this.player.show();
+                this.enimy.show();
+                this.updateGameUi();
+                // увеличение скорости / уровня сложности каждые 10 сек
+                this.dynamycData.levelTimer = setInterval(this.levelUp, 10000);
+                this.isStarted = true;
+                console.log("Game started");
+
+
+                // game loop
+                while(this.isStarted) {
+                    var dt = (Date.now() - time) / 1000;    // дельта тайм в секундах
+                    time = Date.now();
+                    // поворот игрового поля
+                    var rotateMultipler = (6 * this.gameLevel < 20)? 6 * this.gameLevel : 20;
+                    this.field.style.transform = 'rotateX(' + (this.baseRotationX - rotateMultipler * this.dynamycData.yMultipler)
+                                                +'deg) rotateY(' + (rotateMultipler * this.dynamycData.xMultipler) + 'deg)';
+                    // поворачиваем аватар персонажа в противоположную сторону
+                    this.player.avatar.style.transform = 'rotateX(' + (rotateMultipler * this.dynamycData.yMultipler - this.baseRotationX) + 'deg) translateY(-50%)';
+
+                    var pX = this.player.getX(), pY = this.player.getY();
+                    var eX = this.enimy.getX(), eY = this.enimy.getY();
+                    var moveToX = pX, moveToY = pY;
+                    
+                    var dist = Math.sqrt((pX - eX)**2 + (pY-eY)**2);    // расстояние между персонажем и "врагом"
+                    if(this.enimy.width / 2 + this.player.width / 2 >= dist) {
+                        moveToX = eX;
+                        moveToY = eY;
+                    } else {
+                        if(Math.abs(this.dynamycData.xMultipler) > 0.1) moveToX = this.dynamycData.xMultipler > 0.1 ? fRect.width - this.player.width / 2 : this.player.width / 2;
+                        if(Math.abs(this.dynamycData.yMultipler) > 0.1) moveToY = this.dynamycData.yMultipler > 0.1 ? fRect.height - this.player.height / 2 : this.player.height / 2;
+                    }
+                    // двигаем персонажа к полученным координатам, а "врага" - к персонажу
+                    var sMultipler = Math.sqrt(this.dynamycData.xMultipler ** 2 + this.dynamycData.yMultipler ** 2);
+                    var speed = sMultipler * dt * this.player.baseSpeed;
+                    this.player.moveTo(moveToX, moveToY, speed * this.gameLevel);
+                    this.enimy.moveTo(pX, pY, this.enimy.baseSpeed * dt * this.gameLevel);
+                    
+                    
+                    this.score += Math.round(dt * 100) / 10;
+                    // если расстояние между центрами персонажа и "врага" достигло "0" - конец игры
+                    if(Math.round(dist) < this.player.width / 10) {
+                        this.stop();
+                    } else await delay(15);
+                }
+            }
+
+
+
+            this.stop = () => {
+                this.controller.removeEventListener("mousemove", this.mouseMove);
+                this.controller.style.pointerEvents = 'none';
+                this.gameUi.style.visibility = 'hidden';
+                this.isStarted = false;
+                this.player.hide();
+                this.enimy.hide();
+                clearTimeout(this.dynamycData.uiTimer);
+                clearInterval(this.dynamycData.levelTimer);
+                
+                console.log("Game stopped");
+                
+                document.getElementById('game-over').style.display = 'block';
+                this.endScoreUi.innerText = Math.floor(this.score);
+                this.startButton.innerText = 'Play again';
+                this.startScreen.style.visibility = 'visible';
+            }
+
+
+
+            // Конструктор "персонажа", умеющего двигаться к заданной точке c некоторой скоростью
+            function Character(el, avatar) {
+                this.el = el;
+                this.avatar = avatar;
+                this.baseSpeed = 0;
+                this.baseOpacity = this.el.style.opacity;
+                this.width = this.el.clientWidth;
+                this.height = this.el.clientHeight;
+                this.avatarYOffset = 0;
+                this.getX = () => this.el.offsetLeft + this.width / 2;
+                this.getY = () => this.el.offsetTop + this.height / 2;
+                this.moveTo = (x, y, speed = this.baseSpeed) => {
+                    var dX = x - this.getX();
+                    var dY = y - this.getY();
+                    var dXdY = Math.sqrt(dX ** 2 + dY ** 2);
+                    var cos = dX / dXdY;
+                    var sin = dY / dXdY;
+                    this.setX( speed * cos + x - dX );
+                    this.setY( speed * sin + y - dY );
+                }
+                this.setX = (x) => {
+                    this.el.style.left = (x - this.width / 2) + 'px';
+                    this.avatar.style.left = (x - this.avatar.clientWidth / 2) + 'px';
+                }
+                this.setY = (y) => {
+                    this.el.style.top = (y - this.height / 2) + 'px';
+                    this.avatar.style.top = (y + this.avatarYOffset - this.avatar.clientHeight / 2) + 'px';
+                }
+                this.show = () => {
+                    this.el.style.opacity = this.baseOpacity;
+                    this.avatar.style.opacity = 1;
+                }
+                this.hide = () => {
+                    this.el.style.opacity = 0;
+                    this.avatar.style.opacity = 0;
+                }
+
+                
+                this.hide();
+            }
+
+
+            function delay(ms) {
+                return new Promise(resolve => setTimeout(resolve, ms));
+            }
+
+
+            this.startButton.addEventListener("click", this.start);    // кнопка старт
+        };
+
+        const game = new BlackHoleGame();
+        
+    </script>
+</html>
